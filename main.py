@@ -21,21 +21,13 @@ driver.get(base_url)
 content = driver.page_source
 soup = BeautifulSoup(content, 'html.parser')
 
-
-#content =  io.open("mpr.html", "r", encoding="utf8")
-#soup = BeautifulSoup(content,'html.parser')
-
-
 # Definitions
-definitions = open("definitions.txt", "w")
+definitions = open("txt/definitions.txt", "w")
 for dd in soup.findAll('dd'):
     definedTerm = dd.find('span', class_='DefinedTerm')
     if definedTerm is not None:
         word = definedTerm.get_text()
         definition = dd.get_text().replace(word, '').strip()
-        print(word)
-        print(definition)
-        print('')
         definitions.write(word)
         definitions.write('\r\n')
         definitions.write(definition.encode('utf8', 'replace'))
@@ -43,21 +35,21 @@ for dd in soup.findAll('dd'):
         definitions.write('\r\n')
 definitions.close()
 
-
-
 # Certificates
-'''
-certificates = open("certificates.txt", "w")
+certificates = open("txt/certificates.txt", "w")
 for certificateLetter in soup.find_all("a", id=lambda value: value and value.startswith("s-100p")):
     # TODO: Split out the (a) so we can grab the titles of certificates for later
     certificateName = certificateLetter.previous_element.get_text()
     certificateName = certificateName.encode('utf-8').replace(';','').replace("\xc2\xa0", " ").replace('.','')
     certificateName = re.sub(' and$', '', certificateName).strip()
+    certificateNameSplit = certificateName.split(' ')
+    certificateNameParts = certificateNameSplit[1:]
+    certificateName = ' '.join(certificateNameParts).strip().replace('\r\n', '')
     certificates.write(certificateName)
     certificates.write('\r\n')
 
 certificates.close()
-'''
+
 # List of functions possibly put them in their own files at some point
 def clean_html_certificate_header(header):
     return header.strip().replace('\r\n', '').encode('utf-8').replace("\xc2\xa0", " ")
@@ -93,18 +85,10 @@ def parse_certificate_information(certificateName, html):
     repeat_character('=', 70)
 
 # Certificate Requirements
-'''
-certificatesRequirements = open("definitions.txt", "w")
-certificateNames = open("certificates.txt", "r")
-lines = certificateNames.readlines() 
-notFound = []
 
+certificateNames = open("txt/certificates.txt", "r")
+lines = certificateNames.readlines() 
 for line in lines: 
     hasData = False
-    linesSplit = line.split(' ')
-    certNameParts = linesSplit[1:]
-    certName = ' '.join(certNameParts).strip().replace('\r\n', '')
-    parse_certificate_information(certName, soup)
-certificatesRequirements.close()
+    parse_certificate_information(line.replace('\r\n', ''), soup)
 certificateNames.close()
-'''
