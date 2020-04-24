@@ -1,0 +1,8 @@
+
+*.code-workspace
+
+# Generated Files
+/txt
+certificates.txt
+definitions.txt
+endorsements.txt
